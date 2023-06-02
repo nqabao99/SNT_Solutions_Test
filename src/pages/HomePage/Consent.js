@@ -9,28 +9,27 @@ import PlaylistAddCheckIcon from "@mui/icons-material/PlaylistAddCheck";
 import { Link } from "react-router-dom";
 
 export default function Consent({ data, defaultDataLang, isSpeaking, speak }) {
-  const [result, setResult] = useState();
-  const [isSave, setIsSave] = useState(false);
-  const recognition = new (window.SpeechRecognition ||
-    window.webkitSpeechRecognition)();
-
-  recognition.lang = defaultDataLang?.language || "en-US";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-
-  recognition.onresult = (event) => {
-    const result = event.results[0][0].transcript;
-    setResult(result);
-  };
-
   const consent = localStorage.getItem("consent")
     ? JSON.parse(localStorage.getItem("consent"))
     : [];
 
-  const handleSpeech = () => {
+  const [result, setResult] = useState();
+  const [isSave, setIsSave] = useState(false);
+
+  const recognition = new (window.SpeechRecognition ||
+    window.webkitSpeechRecognition)();
+
+  recognition.lang = defaultDataLang?.value;
+
+  const handleRecord = () => {
     if (!isSpeaking) {
       recognition.start();
     }
+  };
+
+  recognition.onresult = (event) => {
+    const result = event.results[0][0].transcript;
+    setResult(result);
   };
 
   const handleSaveResult = () => {
@@ -38,7 +37,7 @@ export default function Consent({ data, defaultDataLang, isSpeaking, speak }) {
       {
         nameUser: data?.name,
         language: data?.language?.label,
-        agree: defaultDataLang?.result.includes(result),
+        agree: ["yes", "oui"].includes(result),
         result,
       },
     ];
@@ -116,7 +115,7 @@ export default function Consent({ data, defaultDataLang, isSpeaking, speak }) {
                   fontSize: 40,
                 }}
                 disabled={isSpeaking}
-                onClick={handleSpeech}
+                onClick={handleRecord}
               >
                 <KeyboardVoiceIcon fontSize="inherit" />
               </IconButton>
@@ -133,13 +132,15 @@ export default function Consent({ data, defaultDataLang, isSpeaking, speak }) {
               >
                 Retry
               </Button>
-              <Button
-                variant="contained"
-                endIcon={<NavigateNextIcon />}
-                onClick={handleSaveResult}
-              >
-                Save
-              </Button>
+              {defaultDataLang?.result.includes(result) && (
+                <Button
+                  variant="contained"
+                  endIcon={<NavigateNextIcon />}
+                  onClick={handleSaveResult}
+                >
+                  Save
+                </Button>
+              )}
             </Grid>
           )}
         </>

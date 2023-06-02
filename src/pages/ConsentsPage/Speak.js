@@ -1,17 +1,10 @@
 import { IconButton } from "@mui/material";
-import React, { useState } from "react";
+import React from "react";
 import PlayCircleFilledWhiteIcon from "@mui/icons-material/PlayCircleFilledWhite";
 import PauseIcon from "@mui/icons-material/Pause";
+import useSpeak from "../../hook/useSpeak";
 export default function Speak({ data }) {
-  const [isSpeaking, setIsSpeaking] = useState(false);
-  const speak = (str) => {
-    setIsSpeaking(true);
-    const utterance = new SpeechSynthesisUtterance(str);
-    utterance.onend = () => {
-      setIsSpeaking(false);
-    };
-    window.speechSynthesis.speak(utterance);
-  };
+  const { isSpeaking, speak } = useSpeak();
 
   return (
     <IconButton
